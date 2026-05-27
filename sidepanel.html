@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>审核意见助手</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 顶部标题栏 -->
+  <div id="panel-header">
+    <div id="l1-selector-wrapper">
+      <select id="l1-selector"></select>
+    </div>
+    <button class="btn-icon" id="btn-open-settings" title="设置">⚙️</button>
+  </div>
+
+  <!-- 审核待办区块 -->
+  <div id="todo-section">
+    <div id="todo-header">
+      <div id="todo-header-left">
+        <span id="todo-title">审核待办</span>
+        <label id="todo-guard-switch" title="开启后，点击清空时会检查待办是否全部勾选；关闭则直接清空">
+          <input type="checkbox" id="todo-guard-checkbox">
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+        </label>
+      </div>
+      <span id="todo-progress"></span>
+    </div>
+    <ul id="todo-list"></ul>
+    <div id="todo-add-area">
+      <button id="btn-add-todo">＋ 添加待办</button>
+      <div id="add-todo-input-row">
+        <input type="text" id="add-todo-input" placeholder="输入待办内容，回车确认">
+        <button class="btn-secondary" id="btn-add-todo-cancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 拖拽分割线（待办区 ↔ 模块标签栏） -->
+  <div id="todo-resize-handle"><div id="todo-resize-handle-bar"></div></div>
+
+  <!-- 模块标签栏（横向按钮 + 下拉） -->
+  <div id="module-tabs">
+    <div id="module-tab-buttons"></div>
+    <div id="dropdown-wrapper">
+      <button id="btn-dropdown" title="切换模块">▼</button>
+      <div id="dropdown-menu"></div>
+    </div>
+  </div>
+
+  <!-- 可拖拽分割的主区域 -->
+  <div id="pane-container">
+
+    <!-- 上方：意见列表 -->
+    <div id="top-pane">
+      <div id="comment-section"></div>
+      <div id="add-comment-area">
+        <button id="btn-add-comment">＋ 添加意见</button>
+        <div id="add-comment-input-row">
+          <input type="text" id="add-comment-input" placeholder="输入意见内容，回车确认">
+          <button class="btn-secondary" id="btn-add-cancel">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 拖拽分割线 -->
+    <div id="resize-handle"><div id="resize-handle-bar"></div></div>
+
+    <!-- 下方：已选意见 -->
+    <div id="bottom-pane">
+      <div id="output-label">审核意见</div>
+      <textarea id="output" placeholder="点击上方意见可在此处插入，也可直接编辑"></textarea>
+      <div id="output-actions">
+        <button class="btn-secondary" id="btn-clear">清空</button>
+        <button class="btn-primary" id="btn-copy">复制</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="storage.js"></script>
+  <script src="sidepanel.js"></script>
+</body>
+</html>

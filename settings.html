@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设置 - 审核意见助手</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="settings-page">
+
+  <div class="settings-header">
+    <h1>设置 - 审核意见助手</h1>
+    <p>管理类别、模块和意见模板，所有修改自动保存</p>
+    <div class="settings-header-actions">
+      <label id="auto-export-toggle" title="开启后，每次修改数据时自动下载备份文件">
+        <input type="checkbox" id="auto-export-checkbox">
+        <span style="font-size:12px; color:var(--text-muted); user-select:none;">自动导出</span>
+      </label>
+      <button class="btn-secondary" id="btn-export">导出数据</button>
+      <button class="btn-secondary" id="btn-import">导入数据</button>
+      <input type="file" id="import-file-input" accept=".json" style="display:none;">
+    </div>
+  </div>
+
+  <div class="settings-body">
+    <!-- 左侧面板 -->
+    <div class="module-list-panel">
+      <!-- L1 类别 -->
+      <h2>类别 <span style="font-weight:400; font-size:11px;">点击切换</span></h2>
+      <ul id="l1-list"></ul>
+      <div class="module-list-footer">
+        <button class="btn-primary" id="btn-new-l1">+ 新建类别</button>
+      </div>
+
+      <!-- 审核待办入口 -->
+      <h2 style="margin-top:6px;">全局</h2>
+      <ul id="special-list">
+        <li class="module-list-item special-item" id="todo-entry">
+          <span class="special-icon">📋</span>
+          <span>审核待办</span>
+        </li>
+      </ul>
+
+      <!-- L2 模块列表 -->
+      <h2 style="margin-top:6px;">模块列表 <span style="font-weight:400; font-size:11px;">拖拽可排序</span></h2>
+      <ul id="module-list"></ul>
+      <div class="module-list-footer">
+        <button class="btn-primary" id="btn-new-module">+ 新建模块</button>
+      </div>
+    </div>
+
+    <!-- 右侧详情 -->
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-empty" id="detail-empty">
+        <span>← 选择左侧进行编辑</span>
+      </div>
+
+      <!-- L1 类别编辑视图 -->
+      <div class="detail-content" id="detail-l1" style="display:none;">
+        <div class="detail-name-row">
+          <label>类别名称</label>
+          <input type="text" id="l1-name-input" placeholder="类别名称">
+          <div class="actions">
+            <button class="btn-danger" id="btn-delete-l1">删除类别</button>
+          </div>
+        </div>
+        <div class="detail-l1-info">
+          <p>该类别包含 <strong id="l1-module-count">0</strong> 个模块，<strong id="l1-todo-count">0</strong> 项待办。</p>
+          <p style="color:var(--text-muted); font-size:11px; margin-top:6px;">选择左侧的「审核待办」或具体模块进行详细编辑。</p>
+        </div>
+      </div>
+
+      <!-- 待办编辑视图 -->
+      <div class="detail-content" id="detail-todos" style="display:none;">
+        <div class="detail-name-row">
+          <label>审核待办</label>
+          <span style="color:var(--text-muted); font-size:12px;">当前类别共享，拖拽可排序，点击文字可编辑</span>
+        </div>
+        <ul id="settings-todo-list" class="settings-scroll-list"></ul>
+        <div class="settings-add-comment">
+          <textarea id="new-todo-input" placeholder="输入新待办内容，Ctrl+Enter 快速添加" rows="2"></textarea>
+          <div class="settings-add-comment-actions">
+            <button class="btn-primary" id="btn-add-todo-settings">添加待办</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 模块编辑视图 -->
+      <div class="detail-content" id="detail-content" style="display:none;">
+        <!-- 模块名称编辑 -->
+        <div class="detail-name-row">
+          <label>模块名称</label>
+          <input type="text" id="module-name-input" placeholder="模块名称">
+          <div class="actions">
+            <button class="btn-danger" id="btn-delete-module">删除模块</button>
+          </div>
+        </div>
+
+        <!-- L3 意见列表 -->
+        <div class="detail-comments-header">
+          <h3>意见列表</h3>
+          <span style="font-size:11px; color: var(--text-muted);">拖拽可排序，点击文字可编辑</span>
+        </div>
+        <ul id="settings-comment-list" class="settings-scroll-list"></ul>
+
+        <!-- 添加意见 -->
+        <div class="settings-add-comment">
+          <textarea id="new-comment-input" placeholder="输入新意见内容，Ctrl+Enter 快速添加&#10;支持多行内容" rows="3"></textarea>
+          <div class="settings-add-comment-actions">
+            <button class="btn-primary" id="btn-add-comment">添加意见</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="storage.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>
