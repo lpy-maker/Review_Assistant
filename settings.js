@@ -582,6 +582,48 @@ function bindEvents() {
     if (file) importData(file);
     e.target.value = '';
   });
+
+  // 侧边栏修改后同步
+  window.addEventListener('storage', (e) => {
+    if (e.key !== STORAGE_KEY) return;
+    data = loadData();
+
+    // 检查当前选中的项目是否仍存在
+    const catIds = data.categories.map(c => c.id);
+    if (!catIds.includes(activeL1Id)) {
+      activeL1Id = data.categories[0]?.id || null;
+      activeView = null;
+      activeModuleId = null;
+    }
+
+    if (activeView === 'module' && activeModuleId) {
+      const cat = getActiveCategory();
+      if (cat) {
+        const modIds = cat.modules.map(m => m.id);
+        if (!modIds.includes(activeModuleId)) {
+          activeModuleId = cat.modules[0]?.id || null;
+        }
+      } else {
+        activeModuleId = null;
+      }
+    }
+
+    // 重新渲染
+    renderL1List();
+    renderTodoEntry();
+    renderModuleList();
+
+    if (activeView === 'l1' && activeL1Id) {
+      selectL1(activeL1Id);
+    } else if (activeView === 'todo') {
+      selectTodoView();
+    } else if (activeView === 'module' && activeModuleId) {
+      selectModule(activeModuleId);
+    } else {
+      if (activeL1Id) selectL1(activeL1Id);
+      else showDetailEmpty();
+    }
+  });
 }
 
 // ===== 工具函数 =====
