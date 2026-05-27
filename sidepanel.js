@@ -3,28 +3,21 @@ let todoGuardOn = loadTodoGuard();
 let currentL1Id = null;
 let currentL2Id = null;
 let savedCursor = null; // 记录 textarea 光标位置，用于插入
-let autoExportTimer = null;
 
 // 包装 saveData，自动导出
 const _originalSaveData = saveData;
 saveData = function(d) {
   _originalSaveData(d);
   if (localStorage.getItem('autoExport') !== '1') return;
-  clearTimeout(autoExportTimer);
-  autoExportTimer = setTimeout(() => {
-    const payload = { version: 3, categories: d.categories };
-    const json = JSON.stringify(payload, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    chrome.downloads.download({
-      url: url,
-      filename: '审核意见助手数据_自动备份.json',
-      saveAs: false,
-      conflictAction: 'overwrite'
-    }, () => {
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    });
-  }, 2000);
+  const payload = { version: 3, categories: d.categories };
+  const json = JSON.stringify(payload, null, 2);
+  const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
+  chrome.downloads.download({
+    url: dataUrl,
+    filename: '审核意见助手数据_自动备份.json',
+    saveAs: false,
+    conflictAction: 'overwrite'
+  });
 };
 
 // ===== 初始化 =====

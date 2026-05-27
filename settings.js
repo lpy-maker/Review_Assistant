@@ -7,13 +7,12 @@ let moduleDragSrcIndex = null;
 let todoDragSrcIndex = null;
 let l1DragSrcIndex = null;
 let autoExportOn = loadAutoExport();
-let autoExportTimer = null;
 
 // 包装 saveData，自动导出
 const _originalSaveData = saveData;
 saveData = function(d) {
   _originalSaveData(d);
-  scheduleAutoExport();
+  if (autoExportOn) doAutoExport();
 };
 
 function loadAutoExport() {
@@ -24,25 +23,15 @@ function saveAutoExport(on) {
   localStorage.setItem('autoExport', on ? '1' : '0');
 }
 
-function scheduleAutoExport() {
-  if (!autoExportOn) return;
-  clearTimeout(autoExportTimer);
-  autoExportTimer = setTimeout(doAutoExport, 2000);
-}
-
 function doAutoExport() {
   const payload = { version: 3, categories: data.categories };
   const json = JSON.stringify(payload, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+  const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
   chrome.downloads.download({
-    url: url,
+    url: dataUrl,
     filename: '审核意见助手数据_自动备份.json',
     saveAs: false,
     conflictAction: 'overwrite'
-  }, () => {
-    // 延迟释放 blob URL
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
 }
 
