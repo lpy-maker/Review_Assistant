@@ -5,6 +5,7 @@ let activeModuleId = null;
 let commentDragSrcIndex = null;
 let moduleDragSrcIndex = null;
 let todoDragSrcIndex = null;
+let l1DragSrcIndex = null;
 let autoExportOn = loadAutoExport();
 let autoExportTimer = null;
 
@@ -66,6 +67,12 @@ function renderL1List() {
     li.className = 'module-list-item' + (cat.id === activeL1Id ? ' active' : '');
     li.dataset.id = cat.id;
     li.dataset.index = index;
+    li.draggable = true;
+
+    const handle = document.createElement('span');
+    handle.className = 'drag-handle';
+    handle.textContent = '⋮⋮';
+    handle.title = '拖拽排序';
 
     const span = document.createElement('span');
     span.textContent = cat.name;
@@ -79,9 +86,38 @@ function renderL1List() {
       deleteL1(cat.id);
     });
 
+    li.appendChild(handle);
     li.appendChild(span);
     li.appendChild(delBtn);
     li.addEventListener('click', () => selectL1(cat.id));
+
+    // L1 拖拽
+    li.addEventListener('dragstart', (e) => {
+      l1DragSrcIndex = index;
+      li.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    li.addEventListener('dragend', () => {
+      li.classList.remove('dragging');
+      document.querySelectorAll('#l1-list .module-list-item').forEach(el => el.classList.remove('drag-over'));
+    });
+    li.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('#l1-list .module-list-item').forEach(el => el.classList.remove('drag-over'));
+      li.classList.add('drag-over');
+    });
+    li.addEventListener('drop', (e) => {
+      e.preventDefault();
+      li.classList.remove('drag-over');
+      const targetIndex = parseInt(li.dataset.index);
+      if (l1DragSrcIndex === null || l1DragSrcIndex === targetIndex) return;
+      const [moved] = data.categories.splice(l1DragSrcIndex, 1);
+      data.categories.splice(targetIndex, 0, moved);
+      l1DragSrcIndex = null;
+      saveData(data);
+      renderL1List();
+    });
 
     ul.appendChild(li);
   });
