@@ -523,16 +523,8 @@ body.settings-page {
 }
 .settings-header-actions {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
-}
-#auto-export-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  user-select: none;
 }
 .settings-header h1 { font-size: 17px; font-weight: 600; }
 .settings-header p { color: var(--text-muted); font-size: 12px; margin-top: 2px; }

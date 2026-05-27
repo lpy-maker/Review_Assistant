@@ -6,34 +6,6 @@ let commentDragSrcIndex = null;
 let moduleDragSrcIndex = null;
 let todoDragSrcIndex = null;
 let l1DragSrcIndex = null;
-let autoExportOn = loadAutoExport();
-
-// 包装 saveData，自动导出
-const _originalSaveData = saveData;
-saveData = function(d) {
-  _originalSaveData(d);
-  if (autoExportOn) doAutoExport();
-};
-
-function loadAutoExport() {
-  return localStorage.getItem('autoExport') === '1';
-}
-
-function saveAutoExport(on) {
-  localStorage.setItem('autoExport', on ? '1' : '0');
-}
-
-function doAutoExport() {
-  const payload = { version: 3, categories: data.categories };
-  const json = JSON.stringify(payload, null, 2);
-  const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
-  chrome.downloads.download({
-    url: dataUrl,
-    filename: '审核意见助手数据_自动备份.json',
-    saveAs: false,
-    conflictAction: 'overwrite'
-  });
-}
 
 // ===== 初始化 =====
 
@@ -125,9 +97,7 @@ function selectL1(id) {
   const cat = getActiveCategory();
   if (!cat) { showDetailEmpty(); return; }
 
-  document.getElementById('detail-empty').style.display = 'none';
-  document.getElementById('detail-todos').style.display = 'none';
-  document.getElementById('detail-content').style.display = 'none';
+  hideAllDetails();
   document.getElementById('detail-l1').style.display = 'flex';
   document.getElementById('l1-name-input').value = cat.name;
   document.getElementById('l1-module-count').textContent = cat.modules.length;
@@ -225,9 +195,7 @@ function selectModule(id) {
   const module = getModule(id);
   if (!module) { showDetailEmpty(); return; }
 
-  document.getElementById('detail-empty').style.display = 'none';
-  document.getElementById('detail-todos').style.display = 'none';
-  document.getElementById('detail-l1').style.display = 'none';
+  hideAllDetails();
   document.getElementById('detail-content').style.display = 'flex';
   document.getElementById('module-name-input').value = module.name;
   renderCommentList(module);
@@ -241,22 +209,25 @@ function selectTodoView() {
   renderTodoEntry();
   renderModuleList();
 
-  document.getElementById('detail-empty').style.display = 'none';
-  document.getElementById('detail-content').style.display = 'none';
-  document.getElementById('detail-l1').style.display = 'none';
+  hideAllDetails();
   document.getElementById('detail-todos').style.display = 'flex';
   renderTodoListSettings();
 }
 
 function showDetailEmpty() {
+  hideAllDetails();
   document.getElementById('detail-empty').style.display = 'flex';
-  document.getElementById('detail-content').style.display = 'none';
-  document.getElementById('detail-todos').style.display = 'none';
-  document.getElementById('detail-l1').style.display = 'none';
   activeView = null;
   activeModuleId = null;
   renderTodoEntry();
   renderModuleList();
+}
+
+function hideAllDetails() {
+  document.getElementById('detail-empty').style.display = 'none';
+  document.getElementById('detail-content').style.display = 'none';
+  document.getElementById('detail-todos').style.display = 'none';
+  document.getElementById('detail-l1').style.display = 'none';
 }
 
 // ===== 待办列表渲染（L2'，右侧详情） =====
@@ -489,16 +460,6 @@ function addComment(text) {
 // ===== 事件绑定 =====
 
 function bindEvents() {
-  // 自动导出开关
-  const autoExportCb = document.getElementById('auto-export-checkbox');
-  if (autoExportCb) {
-    autoExportCb.checked = autoExportOn;
-    autoExportCb.addEventListener('change', (e) => {
-      autoExportOn = e.target.checked;
-      saveAutoExport(autoExportOn);
-    });
-  }
-
   // 待办入口
   document.getElementById('todo-entry').addEventListener('click', selectTodoView);
 
@@ -613,7 +574,6 @@ function bindEvents() {
     if (e.key !== STORAGE_KEY) return;
     data = loadData();
 
-    // 检查当前选中的项目是否仍存在
     const catIds = data.categories.map(c => c.id);
     if (!catIds.includes(activeL1Id)) {
       activeL1Id = data.categories[0]?.id || null;
@@ -633,7 +593,6 @@ function bindEvents() {
       }
     }
 
-    // 重新渲染
     renderL1List();
     renderTodoEntry();
     renderModuleList();
@@ -693,7 +652,6 @@ function importData(file) {
     try {
       const imported = JSON.parse(e.target.result);
       if (!imported.categories || !Array.isArray(imported.categories)) {
-        // Try old format
         if (imported.modules && Array.isArray(imported.modules)) {
           if (!confirm('检测到旧版本数据，导入后将自动迁移为新格式，确定继续吗？')) return;
           imported.categories = [{
@@ -708,7 +666,6 @@ function importData(file) {
         }
       }
 
-      // Ensure backward compat
       imported.categories.forEach(cat => {
         if (!Array.isArray(cat.todos)) cat.todos = [];
         if (cat.modules && Array.isArray(cat.modules)) {

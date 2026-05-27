@@ -6,8 +6,7 @@
   "minimum_chrome_version": "116",
   "permissions": [
     "sidePanel",
-    "clipboardWrite",
-    "downloads"
+    "clipboardWrite"
   ],
   "action": {
     "default_title": "审核意见助手",

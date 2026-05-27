@@ -4,22 +4,6 @@ let currentL1Id = null;
 let currentL2Id = null;
 let savedCursor = null; // 记录 textarea 光标位置，用于插入
 
-// 包装 saveData，自动导出
-const _originalSaveData = saveData;
-saveData = function(d) {
-  _originalSaveData(d);
-  if (localStorage.getItem('autoExport') !== '1') return;
-  const payload = { version: 3, categories: d.categories };
-  const json = JSON.stringify(payload, null, 2);
-  const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
-  chrome.downloads.download({
-    url: dataUrl,
-    filename: '审核意见助手数据_自动备份.json',
-    saveAs: false,
-    conflictAction: 'overwrite'
-  });
-};
-
 // ===== 初始化 =====
 
 function init() {
